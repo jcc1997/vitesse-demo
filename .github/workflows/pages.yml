@@ -77,13 +77,45 @@ jobs:
 
   notify-solo-lab:
     needs: deploy
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.callback_url != '' && inputs.requirement_id != '' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Notify success callback
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve callback context
+        id: context
         env:
-          CALLBACK_URL: ${{ inputs.callback_url }}
-          REQUIREMENT_ID: ${{ inputs.requirement_id }}
+          INPUT_CALLBACK_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.callback_url || '' }}
+          INPUT_REQUIREMENT_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.requirement_id || '' }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const path = '.solo-lab/deploy-context.json'
+          const outputFile = process.env.GITHUB_OUTPUT
+
+          let callbackUrl = process.env.INPUT_CALLBACK_URL || ''
+          let requirementId = process.env.INPUT_REQUIREMENT_ID || ''
+
+          if (fs.existsSync(path)) {
+            const parsed = JSON.parse(fs.readFileSync(path, 'utf8'))
+            callbackUrl = callbackUrl || parsed.callbackUrl || ''
+            requirementId = requirementId || parsed.requirementId || ''
+          }
+
+          const lines = [
+            `callback_url=${callbackUrl}`,
+            `requirement_id=${requirementId}`,
+            `present=${callbackUrl && requirementId ? 'true' : 'false'}`
+          ]
+
+          fs.appendFileSync(outputFile, `${lines.join('\n')}\n`)
+          NODE
+
+      - name: Notify success callback
+        if: ${{ steps.context.outputs.present == 'true' }}
+        env:
+          CALLBACK_URL: ${{ steps.context.outputs.callback_url }}
+          REQUIREMENT_ID: ${{ steps.context.outputs.requirement_id }}
           PAGE_URL: ${{ needs.deploy.outputs.page_url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |

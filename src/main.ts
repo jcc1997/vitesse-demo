@@ -67,6 +67,10 @@ function render(): void {
         <p class="lede">
           This tiny app is published by GitHub Actions and exercised remotely by Playwright.
         </p>
+        <div data-testid="validation-banner" class="validation-banner">
+          <span class="validation-pill">Validation flow active</span>
+          <strong>This build was deployed from the solo-lab GitHub Actions pipeline.</strong>
+        </div>
         <div class="meta-grid">
           <article class="meta-card">
             <span class="meta-label">Requirement</span>
