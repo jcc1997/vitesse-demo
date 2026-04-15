@@ -1,10 +1,5 @@
+node_modules/
+dist/
+.pnpm-store/
+dist-types/
 .DS_Store
-.vite-ssg-dist
-.vite-ssg-temp
-*.local
-dist
-dist-ssr
-node_modules
-.idea/
-*.log
-cypress/downloads

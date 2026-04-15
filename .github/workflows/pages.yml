@@ -1,0 +1,103 @@
+name: Deploy Demo Web
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch or ref to deploy
+        required: true
+        default: main
+      requirement_id:
+        description: solo-lab requirement id for callback
+        required: false
+        default: ""
+      callback_url:
+        description: Public solo-lab callback base URL
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  notify-solo-lab:
+    needs: deploy
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.callback_url != '' && inputs.requirement_id != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify success callback
+        env:
+          CALLBACK_URL: ${{ inputs.callback_url }}
+          REQUIREMENT_ID: ${{ inputs.requirement_id }}
+          PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          cat > payload.json <<EOF
+          {
+            "source": "external_ci",
+            "status": "ready",
+            "url": "${PAGE_URL}",
+            "commitSha": "${GITHUB_SHA}",
+            "buildLogUrl": "${RUN_URL}"
+          }
+          EOF
+          curl --fail --show-error --silent \
+            -X POST \
+            -H 'Content-Type: application/json' \
+            "$CALLBACK_URL/requirements/$REQUIREMENT_ID/environments/callback" \
+            --data @payload.json
