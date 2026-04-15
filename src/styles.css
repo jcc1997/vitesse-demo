@@ -71,6 +71,27 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.validation-banner {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(251, 191, 36, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.validation-pill {
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  color: #f8fafc;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
 .meta-card,
 .panel-accent {
   background: linear-gradient(140deg, rgba(251, 191, 36, 0.18), rgba(14, 165, 233, 0.12));
