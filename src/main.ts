@@ -20,6 +20,28 @@ let tasks: Task[] = [
   { id: 2, text: "Add a new task through the UI", done: false }
 ];
 
+const STORAGE_KEY = "vitesse-demo:theme";
+
+function getStoredTheme(): "dark" | "light" {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  return "dark";
+}
+
+function setTheme(theme: "dark" | "light"): void {
+  localStorage.setItem(STORAGE_KEY, theme);
+  document.documentElement.classList.toggle("light", theme === "light");
+}
+
+function toggleTheme(): void {
+  const current = getStoredTheme();
+  setTheme(current === "dark" ? "light" : "dark");
+  render();
+}
+
+// Apply stored theme on load
+setTheme(getStoredTheme());
+
 function getBuildMetadata(): { requirement: string; commit: string } {
   const params = new URLSearchParams(window.location.search);
   return {
@@ -60,6 +82,9 @@ function render(): void {
   const completedCount = tasks.filter((task) => task.done).length;
 
   root.innerHTML = `
+    <button data-testid="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+      ${getStoredTheme() === "dark" ? "☀️" : "🌙"}
+    </button>
     <main class="shell">
       <section class="hero">
         <p class="eyebrow">solo-lab external demo</p>
@@ -145,6 +170,9 @@ function render(): void {
   const form = root.querySelector<HTMLFormElement>('[data-testid="task-form"]');
   const input = root.querySelector<HTMLInputElement>('[data-testid="task-input"]');
   const clearDoneButton = root.querySelector<HTMLButtonElement>('[data-testid="clear-done"]');
+  const themeToggle = root.querySelector<HTMLButtonElement>('[data-testid="theme-toggle"]');
+
+  themeToggle?.addEventListener("click", toggleTheme);
 
   incrementButton?.addEventListener("click", () => {
     counter += 1;
