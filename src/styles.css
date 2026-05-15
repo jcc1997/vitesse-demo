@@ -1,24 +1,111 @@
-:root {
-  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
-  color: #f3efe6;
-  background:
-    radial-gradient(circle at top, rgba(255, 179, 71, 0.18), transparent 35%),
+:root,
+[data-theme="dark"] {
+  --bg-page: #111827;
+  --bg-gradient: radial-gradient(circle at top, rgba(255, 179, 71, 0.18), transparent 35%),
     linear-gradient(160deg, #111827 0%, #1f2937 55%, #0b1120 100%);
+  --bg-panel: rgba(15, 23, 42, 0.7);
+  --bg-panel-card: rgba(15, 23, 42, 0.9);
+  --bg-input: rgba(15, 23, 42, 0.92);
+  --bg-validation-pill: rgba(15, 23, 42, 0.9);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-input: rgba(255, 255, 255, 0.14);
+  --text-primary: #f3efe6;
+  --text-secondary: #cbd5e1;
+  --text-muted: #d1d5db;
+  --text-eyebrow: #fbbf24;
+  --accent-gradient: linear-gradient(135deg, #f97316, #fbbf24);
+  --accent-gradient-panel: linear-gradient(140deg, rgba(251, 191, 36, 0.18), rgba(14, 165, 233, 0.12));
+  --ghost-bg: rgba(148, 163, 184, 0.12);
+  --ghost-text: #e2e8f0;
+  --toggle-bg: rgba(148, 163, 184, 0.2);
+  --toggle-border: rgba(255, 255, 255, 0.12);
+  --toggle-hover-bg: rgba(148, 163, 184, 0.35);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  --banner-bg: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(251, 191, 36, 0.18));
+  --banner-border: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] {
+  --bg-page: #f8fafc;
+  --bg-gradient: radial-gradient(circle at top, rgba(255, 179, 71, 0.08), transparent 35%),
+    linear-gradient(160deg, #e2e8f0 0%, #f1f5f9 55%, #f8fafc 100%);
+  --bg-panel: rgba(255, 255, 255, 0.85);
+  --bg-panel-card: rgba(255, 255, 255, 0.95);
+  --bg-input: rgba(255, 255, 255, 0.95);
+  --bg-validation-pill: rgba(255, 255, 255, 0.9);
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-input: rgba(0, 0, 0, 0.14);
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-eyebrow: #d97706;
+  --accent-gradient: linear-gradient(135deg, #ea580c, #d97706);
+  --accent-gradient-panel: linear-gradient(140deg, rgba(217, 119, 6, 0.10), rgba(14, 165, 233, 0.08));
+  --ghost-bg: rgba(100, 116, 139, 0.10);
+  --ghost-text: #334155;
+  --toggle-bg: rgba(100, 116, 139, 0.15);
+  --toggle-border: rgba(0, 0, 0, 0.12);
+  --toggle-hover-bg: rgba(100, 116, 139, 0.30);
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.08);
+  --banner-bg: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(217, 119, 6, 0.08));
+  --banner-border: rgba(0, 0, 0, 0.08);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  transition: color 200ms ease, background 200ms ease;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-gradient);
 }
 
 button,
 input {
   font: inherit;
 }
+
+/* ── Theme toggle ── */
+
+.theme-toggle-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--toggle-border);
+  background: var(--toggle-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  user-select: none;
+}
+
+.theme-toggle:hover {
+  background: var(--toggle-hover-bg);
+}
+
+.theme-toggle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ── Layout & panels ── */
 
 .shell {
   width: min(960px, calc(100vw - 32px));
@@ -29,10 +116,10 @@ input {
 .hero,
 .panel {
   backdrop-filter: blur(18px);
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
   border-radius: 24px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow);
   padding: 28px;
 }
 
@@ -44,7 +131,7 @@ input {
   margin: 0 0 8px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #fbbf24;
+  color: var(--text-eyebrow);
   font-size: 12px;
 }
 
@@ -62,7 +149,7 @@ h1 {
 
 .lede,
 .panel-header p {
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .meta-grid {
@@ -77,16 +164,16 @@ h1 {
   margin: 24px 0;
   padding: 16px 18px;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(251, 191, 36, 0.18));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
 }
 
 .validation-pill {
   width: fit-content;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  color: #f8fafc;
+  background: var(--bg-validation-pill);
+  color: var(--text-primary);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -94,7 +181,7 @@ h1 {
 
 .meta-card,
 .panel-accent {
-  background: linear-gradient(140deg, rgba(251, 191, 36, 0.18), rgba(14, 165, 233, 0.12));
+  background: var(--accent-gradient-panel);
 }
 
 .meta-card {
@@ -107,7 +194,7 @@ h1 {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #d1d5db;
+  color: var(--text-muted);
   margin-bottom: 10px;
 }
 
@@ -137,8 +224,8 @@ output {
 
 input[type="text"] {
   flex: 1 1 280px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid var(--border-input);
+  background: var(--bg-input);
   color: inherit;
   padding: 14px 16px;
   border-radius: 14px;
@@ -157,14 +244,14 @@ button:hover {
 }
 
 .primary {
-  background: linear-gradient(135deg, #f97316, #fbbf24);
+  background: var(--accent-gradient);
   color: #111827;
   font-weight: 700;
 }
 
 .ghost {
-  background: rgba(148, 163, 184, 0.12);
-  color: #e2e8f0;
+  background: var(--ghost-bg);
+  color: var(--ghost-text);
 }
 
 .wide {
@@ -176,7 +263,7 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   margin-bottom: 16px;
 }
 
@@ -193,10 +280,10 @@ button:hover {
 }
 
 .task-item {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
   border-radius: 16px;
   padding: 14px 16px;
-  background: rgba(15, 23, 42, 0.9);
+  background: var(--bg-panel-card);
 }
 
 .task-item label {

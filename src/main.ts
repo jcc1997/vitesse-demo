@@ -20,6 +20,25 @@ let tasks: Task[] = [
   { id: 2, text: "Add a new task through the UI", done: false }
 ];
 
+/* ── Theme state ── */
+
+function getTheme(): "dark" | "light" {
+  return (localStorage.getItem("theme") as "dark" | "light") ?? "dark";
+}
+
+function setTheme(theme: "dark" | "light"): void {
+  localStorage.setItem("theme", theme);
+  document.documentElement.setAttribute("data-theme", theme);
+}
+
+function toggleTheme(): void {
+  const current = getTheme();
+  setTheme(current === "dark" ? "light" : "dark");
+}
+
+// Initialise theme on page load
+setTheme(getTheme());
+
 function getBuildMetadata(): { requirement: string; commit: string } {
   const params = new URLSearchParams(window.location.search);
   return {
@@ -58,9 +77,16 @@ function clearDone(): void {
 function render(): void {
   const metadata = getBuildMetadata();
   const completedCount = tasks.filter((task) => task.done).length;
+  const currentTheme = getTheme();
 
   root.innerHTML = `
     <main class="shell">
+      <div class="theme-toggle-wrap">
+        <button data-testid="theme-toggle" class="theme-toggle" aria-label="Toggle dark/light mode">
+          <span class="theme-toggle-icon">${currentTheme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}</span>
+          <span>${currentTheme === "dark" ? "Light" : "Dark"}</span>
+        </button>
+      </div>
       <section class="hero">
         <p class="eyebrow">solo-lab external demo</p>
         <h1 data-testid="page-title">Deployment Validation Console</h1>
@@ -140,11 +166,17 @@ function render(): void {
     </main>
   `;
 
+  const themeToggle = root.querySelector<HTMLButtonElement>('[data-testid="theme-toggle"]');
   const incrementButton = root.querySelector<HTMLButtonElement>('[data-testid="increment"]');
   const decrementButton = root.querySelector<HTMLButtonElement>('[data-testid="decrement"]');
   const form = root.querySelector<HTMLFormElement>('[data-testid="task-form"]');
   const input = root.querySelector<HTMLInputElement>('[data-testid="task-input"]');
   const clearDoneButton = root.querySelector<HTMLButtonElement>('[data-testid="clear-done"]');
+
+  themeToggle?.addEventListener("click", () => {
+    toggleTheme();
+    render();
+  });
 
   incrementButton?.addEventListener("click", () => {
     counter += 1;
